@@ -6,13 +6,18 @@ add_executable(OpenGL ${SOURCES} ${HEADERS})
 
 target_include_directories(OpenGL PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glfw/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glew/include
 )
 
 target_link_directories(OpenGL PRIVATE 
 	"${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glfw/lib-vc2022"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glew/lib/Release/Win32"
 )
 
 target_link_libraries(OpenGL PRIVATE
 	glfw3.lib
 	opengl32.lib
+	glew32s.lib
 )
+
+target_compile_definitions(OpenGL PRIVATE GLEW_STATIC)
