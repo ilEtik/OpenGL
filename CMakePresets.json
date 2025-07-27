@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20
+  },
+  "configurePresets": [
+    {
+      "name": "vs2022",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Win32",
+      "binaryDir": "Build",
+      "cacheVariables": {
+        "CMAKE_GENERATOR_PLATFORM": "Win32",
+        "CMAKE_CXX_STANDARD": "20"
+      }
+    }
+  ]
+}
