@@ -1,4 +1,3 @@
-
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "src/*.h")
 
@@ -21,3 +20,16 @@ target_link_libraries(OpenGL PRIVATE
 )
 
 target_compile_definitions(OpenGL PRIVATE GLEW_STATIC)
+
+set_target_properties(OpenGL PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/OpenGL"
+)
+
+file(GLOB_RECURSE RES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/res/*")
+
+target_sources(OpenGL PRIVATE ${RES_FILES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/res" PREFIX "Resources" FILES ${RES_FILES})
+
+foreach(file ${RES_FILES})
+    set_source_files_properties(${file} PROPERTIES HEADER_FILE_ONLY ON)
+endforeach()
