@@ -19,7 +19,10 @@ target_link_libraries(OpenGL PRIVATE
 	glew32s.lib
 )
 
-target_compile_definitions(OpenGL PRIVATE GLEW_STATIC)
+target_compile_definitions(OpenGL PRIVATE 
+	GLEW_STATIC
+	$<$<CONFIG:Debug>:DEBUG>
+)
 
 set_target_properties(OpenGL PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/OpenGL"

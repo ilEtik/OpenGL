@@ -7,6 +7,32 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#ifdef DEBUG
+#define ASSERT(x) if (!(x)) __debugbreak();
+#define GLCall(x) GLClearError();\
+        x;\
+        ASSERT(GLLogCall(#x, __FILE__, __LINE__));
+#else
+#define ASSERT(X)
+#define GLCall(x) x
+#endif
+
+static void GLClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line)
+{
+    while (GLenum error = glGetError())
+    {
+        std::cout << std::format("[OpenGL Error] ({0}): {1} {2}:{3}", error, function, file, line) << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
 struct ShaderProgramSource
 {
     std::string VertexSource;
@@ -55,19 +81,19 @@ static ShaderProgramSource ParseShader(const std::string& shaderPath)
 
 static unsigned int CompileShader(unsigned int type, const std::string& source)
 {
-    unsigned int id = glCreateShader(type);
+    GLCall(unsigned int id = glCreateShader(type));
     const char* src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
+    GLCall(glShaderSource(id, 1, &src, nullptr));
+    GLCall(glCompileShader(id));
 
     int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    GLCall(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
     if (result == GL_FALSE)
     {
         int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        GLCall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         char* message = (char*)alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
+        GLCall(glGetShaderInfoLog(id, length, &length, message));
 
         std::cout << std::format("Failed to compile shader type: {0}\n", type);
         std::cout << message << std::endl;
@@ -80,7 +106,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
 
 static unsigned int CreateShader(const std::string& vertexSource, const std::string& fragmentSource)
 {
-    unsigned int program = glCreateProgram();
+    GLCall(unsigned int program = glCreateProgram());
 
     unsigned int vertexShader = CompileShader(GL_VERTEX_SHADER, vertexSource);
     unsigned int fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentSource);
@@ -90,17 +116,17 @@ static unsigned int CreateShader(const std::string& vertexSource, const std::str
         return 0;
     }
 
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
+    GLCall(glAttachShader(program, vertexShader));
+    GLCall(glAttachShader(program, fragmentShader));
 
-    glLinkProgram(program);
-    glValidateProgram(program);
+    GLCall(glLinkProgram(program));
+    GLCall(glValidateProgram(program));
 
-    glDetachShader(program, vertexShader);
-    glDetachShader(program, fragmentShader);
+    GLCall(glDetachShader(program, vertexShader));
+    GLCall(glDetachShader(program, fragmentShader));
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    GLCall(glDeleteShader(vertexShader));
+    GLCall(glDeleteShader(fragmentShader));
 
     return program;
 }
@@ -129,38 +155,49 @@ int main()
         return -1;
     }
 
-    std::cout << std::format("OpenGL Version: {0}\n", (const char*)glGetString(GL_VERSION));
+    GLCall(std::cout << std::format("OpenGL Version: {0}\n", (const char*)glGetString(GL_VERSION)));
 
-    float positions[6] = {
+    float positions[] = {
         -0.5f, -0.5f,
-         0.0f,  0.5f,
          0.5f, -0.5f,
+         0.5f,  0.5f,
+        -0.5f,  0.5f,
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
     };
 
     unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    GLCall(glGenBuffers(1, &buffer));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW));
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+    GLCall(glEnableVertexAttribArray(0));
+    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
+
+    unsigned int ibo;
+    GLCall(glGenBuffers(1, &ibo));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
 
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-    glUseProgram(shader);
+    GLCall(glUseProgram(shader));
 
     while (!glfwWindowShouldClose(window))
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteProgram(shader);
+    GLCall(glDeleteProgram(shader));
 
     glfwTerminate();
     return 0;
