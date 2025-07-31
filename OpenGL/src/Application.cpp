@@ -1,4 +1,5 @@
 #include <string>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -6,10 +7,12 @@
 #include "spdlog/spdlog.h"
 
 #include "Renderer.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
 #include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
+#include "IndexBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 
 int main()
 {
@@ -22,7 +25,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1024, 1024, "OpenGL", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -43,11 +46,18 @@ int main()
 
 	GLCall(spdlog::info("OpenGL Version: {0}", (const char*)glGetString(GL_VERSION)));
 
+	std::unordered_map<std::string, std::string> textures =
+	{
+		{ "Rock", "res/textures/Rock062_1K-PNG/Rock062_1K-PNG_Color.png" },
+		{ "Test-1k", "res/textures/Test-1k.png" },
+		{ "Test-64", "res/textures/Test-64.png" },
+	};
+
 	float positions[] = {
-		-0.5f, -0.5f,
-		 0.5f, -0.5f,
-		 0.5f,  0.5f,
-		-0.5f,  0.5f,
+		-0.9f, -0.9f, 0.0f, 0.0f,
+		 0.9f, -0.9f, 1.0f, 0.0f,
+		 0.9f,  0.9f, 1.0f, 1.0f,
+		-0.9f,  0.9f, 0.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
@@ -55,11 +65,15 @@ int main()
 		2, 3, 0
 	};
 
+	GLCall(glEnable(GL_BLEND));
+	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 	{
 		VertexArray vertexArray;
-		VertexBuffer vertexBuffer(positions, 4 * 2 * sizeof(float));
+		VertexBuffer vertexBuffer(positions, 4 * 4 * sizeof(float));
 
 		VertexBufferLayout layout;
+		layout.Push<float>(2);
 		layout.Push<float>(2);
 		vertexArray.AddBuffer(vertexBuffer, layout);
 
@@ -67,42 +81,21 @@ int main()
 
 		Shader shader("res/shaders/Basic.shader");
 
+		Texture texture(textures["Test-1k"]);
+		texture.Bind();
+
 		vertexArray.Unbind();
 		vertexBuffer.Unbind();
 		indexBuffer.Unbind();
 		shader.Unbind();
 
-		float r = 0.3f, g = 0.6f, b = 0.9f;
-		float rIncrement = 0.01f, gIncrement = 0.01f, bIncrement = 0.01f;
-
 		while (!glfwWindowShouldClose(window))
 		{
-			GLCall(glClear(GL_COLOR_BUFFER_BIT));
+			Renderer::Clear();
 
 			shader.Bind();
-			shader.SetUniform4f("u_Color", r, g, b, 1.0f);
 
-			vertexArray.Bind();
-
-			GLCall(glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr));
-
-			if (r > 1.0f)
-				rIncrement = -0.02f;
-			else if (r < 0.0f)
-				rIncrement = 0.02f;
-			r += rIncrement;
-
-			if (g > 1.0f)
-				gIncrement = -0.02f;
-			else if (g < 0.0f)
-				gIncrement = 0.02f;
-			g += gIncrement;
-
-			if (b > 1.0f)
-				bIncrement = -0.02f;
-			else if (b < 0.0f)
-				bIncrement = 0.02f;
-			b += bIncrement;
+			Renderer::Draw(vertexArray, indexBuffer, shader);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();

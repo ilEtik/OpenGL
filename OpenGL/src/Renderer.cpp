@@ -17,3 +17,19 @@ bool GLLogCall(const char* function, const char* file, int line)
 
 	return true;
 }
+
+namespace Renderer
+{
+	void Clear()
+	{
+		GLCall(glClear(GL_COLOR_BUFFER_BIT));
+	}
+
+	void Draw(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Shader& shader)
+	{
+		shader.Bind();
+		vertexArray.Bind();
+
+		GLCall(glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr));
+	}
+}
