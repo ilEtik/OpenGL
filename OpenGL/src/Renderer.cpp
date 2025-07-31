@@ -1,7 +1,6 @@
 #include "Renderer.h"
 
-#include <iostream>
-#include <format>
+#include "spdlog/spdlog.h"
 
 void GLClearError()
 {
@@ -12,7 +11,7 @@ bool GLLogCall(const char* function, const char* file, int line)
 {
 	while (GLenum error = glGetError())
 	{
-		std::cout << std::format("[OpenGL Error] ({0}): {1} {2}:{3}", error, function, file, line) << std::endl;
+		spdlog::error("[OpenGL Error] ({0}): {1} {2}:{3}", error, function, file, line);
 		return false;
 	}
 

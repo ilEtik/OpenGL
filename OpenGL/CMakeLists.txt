@@ -6,6 +6,7 @@ add_executable(OpenGL ${SOURCES} ${HEADERS})
 target_include_directories(OpenGL PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glfw/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glew/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/spdlog/include
 )
 
 target_link_directories(OpenGL PRIVATE 
@@ -22,6 +23,7 @@ target_link_libraries(OpenGL PRIVATE
 target_compile_definitions(OpenGL PRIVATE 
 	GLEW_STATIC
 	$<$<CONFIG:Debug>:DEBUG>
+	FMT_UNICODE=0
 )
 
 set_target_properties(OpenGL PROPERTIES

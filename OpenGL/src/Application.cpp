@@ -1,9 +1,9 @@
-#include <iostream>
-#include <format>
 #include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include "spdlog/spdlog.h"
 
 #include "Renderer.h"
 #include "VertexBuffer.h"
@@ -36,12 +36,12 @@ int main()
 	GLenum glewInitResult = glewInit();
 	if (glewInitResult != GLEW_OK)
 	{
-		std::cout << std::format("Glew Init failed with error: {0}\n", glewInitResult);
+		spdlog::critical("Glew Init failed with error: {0}", glewInitResult);
 		glfwTerminate();
 		return -1;
 	}
 
-	GLCall(std::cout << std::format("OpenGL Version: {0}\n", (const char*)glGetString(GL_VERSION)));
+	GLCall(spdlog::info("OpenGL Version: {0}", (const char*)glGetString(GL_VERSION)));
 
 	float positions[] = {
 		-0.5f, -0.5f,

@@ -1,9 +1,9 @@
 #include "Shader.h"
 
-#include <iostream>
-#include <format>
 #include <sstream>
 #include <fstream>
+
+#include "spdlog/spdlog.h"
 
 #include "Renderer.h"
 
@@ -90,8 +90,8 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 		char* message = (char*)alloca(length * sizeof(char));
 		GLCall(glGetShaderInfoLog(id, length, &length, message));
 
-		std::cout << std::format("Failed to compile shader type: {0}\n", type);
-		std::cout << message << std::endl;
+		spdlog::error("Failed to compile shader type: {0}", type);
+		spdlog::error(message);
 
 		return 0;
 	}
@@ -138,7 +138,7 @@ int Shader::GetUniformLocation(const std::string& name)
 	
 	if (location == -1)
 	{
-		std::cout << std::format("Warning: uniform '{0}' doesn't exist!\n", name);
+		spdlog::error("Warning: uniform '{0}' doesn't exist!", name);
 	}
 
 	_uniformLocationCache[name] = location;
