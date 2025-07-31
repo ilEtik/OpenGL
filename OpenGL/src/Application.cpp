@@ -14,6 +14,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 int main()
 {
 	if (!glfwInit())
@@ -25,7 +28,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(1024, 1024, "OpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -54,10 +57,10 @@ int main()
 	};
 
 	float positions[] = {
-		-0.9f, -0.9f, 0.0f, 0.0f,
-		 0.9f, -0.9f, 1.0f, 0.0f,
-		 0.9f,  0.9f, 1.0f, 1.0f,
-		-0.9f,  0.9f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f, 0.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
@@ -79,10 +82,16 @@ int main()
 
 		IndexBuffer indexBuffer(indices, 6);
 
+		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+
 		Shader shader("res/shaders/Basic.shader");
+		shader.Bind();
+		shader.SetUniformMat4f("u_MVP", proj);
 
 		Texture texture(textures["Test-1k"]);
 		texture.Bind();
+
+		shader.SetUniform1i("u_Texture", 0);
 
 		vertexArray.Unbind();
 		vertexBuffer.Unbind();
