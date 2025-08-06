@@ -27,8 +27,11 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL", NULL, NULL);
+	glm::vec2 resolution { 1280, 720 };
+
+	GLFWwindow* window = glfwCreateWindow(resolution.x, resolution.y, "OpenGL", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -36,7 +39,6 @@ int main()
 	}
 
 	glfwMakeContextCurrent(window);
-
 	glfwSwapInterval(1);
 
 	GLenum glewInitResult = glewInit();
@@ -57,10 +59,10 @@ int main()
 	};
 
 	float positions[] = {
-		-1.0f, -1.0f, 0.0f, 0.0f,
-		 1.0f, -1.0f, 1.0f, 0.0f,
-		 1.0f,  1.0f, 1.0f, 1.0f,
-		-1.0f,  1.0f, 0.0f, 1.0f,
+		400.0f, 100.0f, 0.0f, 0.0f,
+		800.0f, 100.0f, 1.0f, 0.0f,
+		800.0f, 500.0f, 1.0f, 1.0f,
+		400.0f, 500.0f, 0.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
@@ -82,13 +84,13 @@ int main()
 
 		IndexBuffer indexBuffer(indices, 6);
 
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		glm::mat4 proj = glm::ortho(0.0f, resolution.x, 0.0f, resolution.y, -1.0f, 1.0f);
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 		shader.SetUniformMat4f("u_MVP", proj);
 
-		Texture texture(textures["Test-1k"]);
+		Texture texture(textures["Rock"]);
 		texture.Bind();
 
 		shader.SetUniform1i("u_Texture", 0);
