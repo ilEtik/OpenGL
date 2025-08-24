@@ -6,7 +6,6 @@ add_executable(OpenGL ${SOURCES} ${HEADERS})
 target_include_directories(OpenGL PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glfw/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glew/include
-	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/spdlog/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glm
 	${CMAKE_CURRENT_SOURCE_DIR}/src/vendor
 )

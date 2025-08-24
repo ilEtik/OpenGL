@@ -17,6 +17,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 int main()
 {
 	if (!glfwInit())
@@ -47,6 +51,27 @@ int main()
 		spdlog::critical("Glew Init failed with error: {0}", glewInitResult);
 		glfwTerminate();
 		return -1;
+	}
+
+	// ImGui Init
+	{
+		ImGui::CreateContext();
+		
+		ImGuiIO& io = ImGui::GetIO();
+		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		
+		ImGui::StyleColorsDark();
+		
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
 	GLCall(spdlog::info("OpenGL Version: {0}", (const char*)glGetString(GL_VERSION)));
@@ -85,10 +110,10 @@ int main()
 		IndexBuffer indexBuffer(indices, 6);
 
 		glm::mat4 proj = glm::ortho(0.0f, resolution.x, 0.0f, resolution.y, -1.0f, 1.0f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-400.0f, 0.0f, 0.0f));
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
-		shader.SetUniformMat4f("u_MVP", proj);
 
 		Texture texture(textures["Rock"]);
 		texture.Bind();
@@ -100,18 +125,52 @@ int main()
 		indexBuffer.Unbind();
 		shader.Unbind();
 
+		glm::vec3 translation(200.0f, 200.0f, 0.0f);
+
 		while (!glfwWindowShouldClose(window))
 		{
 			Renderer::Clear();
 
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+			glm::mat4 mvp = proj * view * model;
+
 			shader.Bind();
+			shader.SetUniformMat4f("u_MVP", mvp);
 
 			Renderer::Draw(vertexArray, indexBuffer, shader);
 
-			glfwSwapBuffers(window);
+			// ImGui New Frame
+			{
+				ImGui_ImplOpenGL3_NewFrame();
+				ImGui_ImplGlfw_NewFrame();
+				ImGui::NewFrame();
+			}
+
+			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, resolution.x);
+
+			// ImGui Render Frame
+			{
+				ImGui::Render();
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+				ImGuiIO& io = ImGui::GetIO();
+				if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+				{
+					GLFWwindow* backup_current_context = glfwGetCurrentContext();
+					ImGui::UpdatePlatformWindows();
+					ImGui::RenderPlatformWindowsDefault();
+					glfwMakeContextCurrent(backup_current_context);
+				}
+			}
+
 			glfwPollEvents();
+			glfwSwapBuffers(window);
 		}
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwTerminate();
 	return 0;

@@ -14,3 +14,6 @@
 **.vcxproj.filters
 **.vcxproj.user
 **.csproj
+
+#ImGui
+**/imgui.ini
