@@ -8,6 +8,7 @@ target_include_directories(OpenGL PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glew/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../Dependencies/glm
 	${CMAKE_CURRENT_SOURCE_DIR}/src/vendor
+	${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_directories(OpenGL PRIVATE 
