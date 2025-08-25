@@ -1,3 +1,5 @@
+#include "Application.h"
+
 #include <string>
 #include <unordered_map>
 
@@ -6,14 +8,6 @@
 
 #include "spdlog/spdlog.h"
 
-#include "Renderer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
-#include "IndexBuffer.h"
-#include "Shader.h"
-#include "Texture.h"
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -21,8 +15,11 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "Renderer.h"
+
 #include "tests/Test.h"
 #include "tests/TestClearColor.h"
+#include "tests/TestTexture2D.h"
 
 int main()
 {
@@ -36,7 +33,6 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	glm::vec2 resolution { 1280, 720 };
 
 	GLFWwindow* window = glfwCreateWindow(resolution.x, resolution.y, "OpenGL", NULL, NULL);
 	if (!window)
@@ -79,14 +75,12 @@ int main()
 
 	GLCall(spdlog::info("OpenGL Version: {0}", (const char*)glGetString(GL_VERSION)));
 
-	GLCall(glEnable(GL_BLEND));
-	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
 	test::Test* currentTest = nullptr;
 	test::TestMenu* testMenu = new test::TestMenu(currentTest);
 	currentTest = testMenu;
 
 	testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+	testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -144,5 +138,6 @@ int main()
 	ImGui::DestroyContext();
 
 	glfwTerminate();
+
 	return 0;
 }

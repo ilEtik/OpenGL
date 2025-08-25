@@ -32,6 +32,7 @@ set_target_properties(OpenGL PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/OpenGL"
 )
 
+# --- Resources ---
 file(GLOB_RECURSE RES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/res/*")
 
 target_sources(OpenGL PRIVATE ${RES_FILES})
@@ -40,3 +41,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/res" PREFIX "Resources" FILES ${R
 foreach(file ${RES_FILES})
     set_source_files_properties(${file} PROPERTIES HEADER_FILE_ONLY ON)
 endforeach()
+
+# --- Source & Headers ---
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${SOURCES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES ${HEADERS})
