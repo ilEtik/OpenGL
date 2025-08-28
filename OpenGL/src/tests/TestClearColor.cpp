@@ -13,8 +13,7 @@ namespace test
 
 	void TestClearColor::OnRender()
 	{
-		GLCall(glClearColor(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[2]));
-		GLCall(glClear(GL_COLOR_BUFFER_BIT));
+		Renderer::ClearColor(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[2]);
 	}
 
 	void TestClearColor::OnImGuiRender()

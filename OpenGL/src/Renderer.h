@@ -22,5 +22,6 @@ bool GLLogCall(const char* function, const char* file, int line);
 namespace Renderer
 {
     void Clear();
+    void ClearColor(float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f);
     void Draw(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Shader& shader);
 }

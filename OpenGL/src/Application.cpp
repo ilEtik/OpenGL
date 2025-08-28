@@ -84,9 +84,7 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-
-		Renderer::Clear();
+		Renderer::ClearColor();
 
 		{
 			ImGui_ImplOpenGL3_NewFrame();
